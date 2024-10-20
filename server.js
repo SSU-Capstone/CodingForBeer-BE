@@ -3,6 +3,11 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const session = require('express-session'); // Import express-session
 require('dotenv').config();
+// import yorkie from 'yorkie-js-sdk'
+const yorkie = require('yorkie-js-sdk');
+const mongoose = require('mongoose');
+
+const mongoURI = process.env.MONGO_URI;
 
 const app = express();
 
@@ -31,7 +36,7 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL
 }, (accessToken, refreshToken, profile, done) => {
-    console.log(profile)
+    console.log(profile);
     return done(null, profile); // Pass user profile to done callback
 }));
 
@@ -50,16 +55,23 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Successful authentication
+        console.log(req.user.id);
+
         res.redirect('/profile');
     }
 );
 
 // Profile route (protected)
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.redirect('/');
     }
-    // If the user is authenticated, show profile info
+        //test
+    // const client = new yorkie.Client('http://172.30.1.30:808');
+    // await client.activate();
+    
+    // const doc = new yorkie.Document(`haha`);
+    // await client.attach(doc, { initialPresence: {} });
     res.send(`Hello, ${req.user.displayName}!`);
 });
 
@@ -71,8 +83,19 @@ app.get('/logout', (req, res) => {
     });
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+
+const mongooseOptions = {
+    useNewUrlParser: true, // Use the new URL parser
+    useUnifiedTopology: true, // Use the new server discovery and monitoring engine
+    useCreateIndex: true, // Make Mongoose use createIndex() instead of ensureIndex()
+    useFindAndModify: false, // Prevent the use of findAndModify()
+};
+
+mongoose.connect(mongoURI, mongooseOptions)
+.then(() => {
+    console.log('MongoDB connected successfully');
+    app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
+})
+.catch(error => {
+    console.error('MongoDB connection error:', error);
 });
