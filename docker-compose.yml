@@ -1,0 +1,32 @@
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: always
+    ports:
+      - '27017:27017'
+
+  yorkie:
+    image: 'yorkieteam/yorkie:latest'
+    container_name: 'yorkie'
+    command: ['server', '--mongo-connection-uri', 'mongodb://mongo:27017']
+    restart: always
+    ports:
+      - '8080:8080'
+      - '8081:8081'
+    depends_on:
+      - mongo
+
+  nodejs:
+    build: .
+    container_name: nodejs
+    restart: always
+    ports:
+      - '4000:4000'
+    depends_on:
+      - mongo
+      - yorkie
+    working_dir: /usr/src/app
+    volumes:
+      - ./:/usr/src/app

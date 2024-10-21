@@ -1,13 +1,14 @@
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-const session = require('express-session'); // Import express-session
+const session = require('express-session'); 
 require('dotenv').config();
 // import yorkie from 'yorkie-js-sdk'
 const yorkie = require('yorkie-js-sdk');
 const mongoose = require('mongoose');
 
 const mongoURI = process.env.MONGO_URI;
+const PORT = process.env.PORT
 
 const app = express();
 
@@ -87,10 +88,11 @@ app.get('/logout', (req, res) => {
 const mongooseOptions = {
     useNewUrlParser: true, // Use the new URL parser
     useUnifiedTopology: true, // Use the new server discovery and monitoring engine
-    useCreateIndex: true, // Make Mongoose use createIndex() instead of ensureIndex()
-    useFindAndModify: false, // Prevent the use of findAndModify()
+    // useCreateIndex: true,  Make Mongoose use createIndex() instead of ensureIndex()
+    // useFindAndModify: false,  Prevent the use of findAndModify()
 };
 
+console.log(mongoURI);
 mongoose.connect(mongoURI, mongooseOptions)
 .then(() => {
     console.log('MongoDB connected successfully');
