@@ -6,6 +6,7 @@ const groupSchema = new mongoose.Schema({
         type: String,
         required: true, 
         trim: true, 
+        uniuqe: true
     },
     users: [{
         type: Number, //first user is leader of the group

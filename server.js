@@ -7,6 +7,8 @@ require('dotenv').config();
 const yorkie = require('yorkie-js-sdk');
 const mongoose = require('mongoose');
 
+const { create_group, get_groups, create_document, get_documents } = require('./controllers/group_controller');
+
 const mongoURI = process.env.MONGO_URI;
 const PORT = process.env.PORT
 
@@ -84,6 +86,11 @@ app.get('/logout', (req, res) => {
     });
 });
 
+app.get('/api/groups', get_groups);
+app.post('/api/groups', create_group);
+
+app.post('/api/groups/:group_name/documents', create_document);
+app.get('/api/groups/:group_name/documents', get_documents);
 
 const mongooseOptions = {
     useNewUrlParser: true, // Use the new URL parser
