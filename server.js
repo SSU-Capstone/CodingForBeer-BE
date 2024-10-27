@@ -13,7 +13,7 @@ const mongoURI = process.env.MONGO_URI;
 const PORT = process.env.PORT
 
 const app = express();
-
+app.use(express.json());
 app.use(session({
     secret: process.env.COOKIE_SECRET, // Secret key from your .env file
     resave: false,
@@ -39,7 +39,7 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: process.env.CALLBACK_URL
 }, (accessToken, refreshToken, profile, done) => {
-    console.log(profile);
+    // console.log(profile);
     return done(null, profile); // Pass user profile to done callback
 }));
 
@@ -58,7 +58,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Successful authentication
-        console.log(req.user.id);
+        // console.log(req.user.id);
 
         res.redirect('/profile');
     }

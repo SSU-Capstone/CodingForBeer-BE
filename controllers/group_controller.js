@@ -36,7 +36,7 @@ const create_document = async (req,res) =>
     //  const { group_id, document_id } = req.body;
     const group_name = req.params.group_name; // < 59
     const document_name = req.body.document_name; // < 60
-    document_key = group_name + '_' + document_name;
+    document_key = group_name + '-' + document_name;
 
     try {
         const group = await Group.findOne({ name : group_name });
@@ -64,7 +64,7 @@ const create_document = async (req,res) =>
         group.documents.push(document_name);
         await group.save();
 
-        return res.status(201).send(document_key);
+        return res.status(201).json({document : document_key});
     } catch (error) {
         console.log(error);
         res.status(500).send("Internal server error");
@@ -79,7 +79,7 @@ const get_groups = async (req,res) =>
 
     try {
         const groups = await Group.find({ users: req.user.id});
-        const group_names = group.map(group => group.name);
+        const group_names = groups.map(group => group.name);
         return res.json(group_names);
     } catch (error) 
     {
@@ -97,9 +97,12 @@ const get_documents = async (req,res) =>
 
     try {
         const group_name = req.params.group_name;
+        console.log(group_name);
         const group = await Group.find({ name : group_name});
-        const documents= group.documents;
-        return res.json(documents);
+        console.log(group);
+        const documents= group[0].documents;
+        console.log(documents);
+        return res.json({document : documents});
     } catch (err) {
         console.error("error fetching documents list",err);
         res.status(500).json({ error : "failed to fetch document list of the group"});
