@@ -7,7 +7,7 @@ services:
     ports:
       - '27017:27017'
     networks:
-      - shared_network
+      - shared-network
 
   yorkie:
     image: 'yorkieteam/yorkie:latest'
@@ -20,7 +20,7 @@ services:
     depends_on:
       - mongo
     networks:
-      - shared_network
+      - shared-network
 
   nodejs:
     build: .
@@ -33,8 +33,8 @@ services:
       - yorkie
     working_dir: /usr/src/app
     networks:
-      - shared_network
+      - shared-network
 
 networks:
-  shared_network:
+  shared-network:
     external: true
