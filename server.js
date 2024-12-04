@@ -74,21 +74,16 @@ app.get('/auth/google/callback',
 );
 
 // Profile route (protected)
-app.get('/profile', async (req, res) => {
-    if (!req.isAuthenticated()) {
-        return res.redirect('/');
+app.get("/auth/status", (req, res) => {
+    if (req.session.isLoggedIn) {
+        res.json({ loggedIn: true });
+    } else {
+        res.json({ loggedIn: false });
     }
-        //test
-    // const client = new yorkie.Client('http://172.30.1.30:808');
-    // await client.activate();
-    
-    // const doc = new yorkie.Document(`haha`);
-    // await client.attach(doc, { initialPresence: {} });
-    res.send(`Hello, ${req.user.displayName}!`);
 });
 
 // Logout route
-app.get('/logout', (req, res) => {
+app.get('/auth/logout', (req, res) => {
     req.logout(() => {
         req.session.destroy(); // Destroy session after logout
         res.redirect('/');
