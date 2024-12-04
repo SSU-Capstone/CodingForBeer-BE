@@ -6,10 +6,10 @@ const crypto = require('crypto');
 const create_group = async (req, res) => 
 {
     console.log(req.isAuthenticated());
-    // if(!req.isAuthenticated())
-    // {
-    //     return res.status(401).json({ error : "Not Authenticated"});
-    // }
+    if(!req.isAuthenticated())
+    {
+        return res.status(401).json({ error : "Not Authenticated"});
+    }
     const leader = req.user.id;
     const group_name = req.body.name;
 
@@ -30,10 +30,10 @@ const create_group = async (req, res) =>
 const create_document = async (req,res) =>
 {
     console.log(req.isAuthenticated());
-    // if(!req.isAuthenticated())
-    // {
-    //     return res.status(401).json({ error : "Not Authenticated"});
-    // }
+    if(!req.isAuthenticated())
+    {
+        return res.status(401).json({ error : "Not Authenticated"});
+    }
     //  const { group_id, document_id } = req.body;
     const group_name = req.params.group_name; // < 59
     const document_name = req.body.document_name; // < 60
@@ -73,10 +73,10 @@ const create_document = async (req,res) =>
 }
 const get_groups = async (req,res) =>
 {
-    // if(!req.isAuthenticated())
-    // {
-    //     return res.status(401).json({ error : "Not Authenticated"});
-    // }
+    if(!req.isAuthenticated())
+    {
+        return res.status(401).json({ error : "Not Authenticated"});
+    }
 
     try {
         const groups = await Group.find({ users: req.user.id});
@@ -91,10 +91,10 @@ const get_groups = async (req,res) =>
 
 const get_documents = async (req,res) =>
 {
-    // if(!req.isAuthenticated())
-    // {
-    //     return res.status(401).json({error : "Not Authenticated"});
-    // }
+    if(!req.isAuthenticated())
+    {
+        return res.status(401).json({error : "Not Authenticated"});
+    }
 
     try {
         const group_name = req.params.group_name;
@@ -111,9 +111,9 @@ const get_documents = async (req,res) =>
 }
 
 const generate_token = async (req, res) => {
-    // if (!req.isAuthenticated()) {
-    //     return res.status(401).json({ error: "Not Authenticated" });
-    // }
+    if (!req.isAuthenticated()) {
+        return res.status(401).json({ error: "Not Authenticated" });
+    }
 
     const groupName = req.params.group_name;
 
@@ -123,15 +123,13 @@ const generate_token = async (req, res) => {
             return res.status(404).json({ error: "Group not found" });
         }
 
-        // Generate a unique invite token
         const inviteToken = crypto.randomBytes(16).toString('hex');
 
-        // Save the token in the group document
         group.inviteToken = inviteToken;
         await group.save();
 
-        // Construct the invite link
-        const inviteLink = `${req.protocol}://${req.get('host')}/groups/invite/${inviteToken}`;
+
+        const inviteLink = `${req.protocol}://${req.get('host')}/api/groups/invite/${inviteToken}`;
 
         return res.status(200).json({ message: "Invite link generated", inviteLink });
     } catch (error) {
@@ -142,39 +140,39 @@ const generate_token = async (req, res) => {
 
 
 const add_user_to_group = async (req, res) => {
-    // if (!req.isAuthenticated()) {
-    //     return res.status(401).json({ error: "Not Authenticated" });
-    // }
-
     const inviteToken = req.params.token;
 
     try {
-        const group = await Group.findOne({ inviteToken });
-        if (!group) {
-            return res.status(404).json({ error: "Invalid or expired invite link" });
+        if (!req.isAuthenticated()) {
+            // Redirect to Google OAuth with `next` query parameter to preserve invite token
+            return res.redirect(`/auth/google?next=/api/groups/invite/${inviteToken}`);
         }
 
-        const userId = req.user.id; // Assuming `req.user` contains the authenticated user ID
+        // Validate the invite token
+        const group = await Group.findOne({ inviteToken });
+        if (!group) {
+            return res.status(404).send("Invalid or expired invite link");
+        }
 
+        // Check if user is already a member of the group
+        const userId = req.user.id;
         if (group.users.includes(userId)) {
-            return res.status(400).json({ error: "User is already a member of the group" });
+            return res.status(400).send("You are already a member of this group");
         }
 
         // Add user to the group
         group.users.push(userId);
-
-        // Optionally, invalidate the invite token to make it one-time use
-        group.inviteToken = null;
-
+        group.inviteToken = null;  // Optional: invalidate the invite token after use
         await group.save();
 
-        return res.status(200).json({ message: "User added to the group", group });
+        // Redirect to a page confirming the user joined
+        return res.redirect(`/`);
     } catch (error) {
-        console.error("Error processing invite link:", error);
-        return res.status(500).json({ error: "Internal Server Error" });
+        console.error("Error processing invite:", error);
+        return res.status(500).send("Internal Server Error");
     }
 };
 
 module.exports = { create_group, create_document, get_groups, get_documents,
-    add_user_to_group
+    add_user_to_group, generate_token
 };
