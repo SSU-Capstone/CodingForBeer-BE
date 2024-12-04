@@ -6,6 +6,8 @@ services:
     restart: always
     ports:
       - '27017:27017'
+    networks:
+      - shared_networks
 
   yorkie:
     image: 'yorkieteam/yorkie:latest'
@@ -17,6 +19,8 @@ services:
       - '8081:8081'
     depends_on:
       - mongo
+    networks:
+      - shared_networks
 
   nodejs:
     build: .
@@ -28,5 +32,9 @@ services:
       - mongo
       - yorkie
     working_dir: /usr/src/app
-    volumes:
-      - ./:/usr/src/app
+    networks:
+      - shared_networks
+
+networks:
+  shared_networks:
+    external: true
