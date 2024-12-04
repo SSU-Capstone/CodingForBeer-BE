@@ -44,7 +44,7 @@ passport.use(new GoogleStrategy({
 }));
 
 // Routes
-app.get('/backend', (req, res) => {
+app.get('/', (req, res) => {
     res.send('<a href="/auth/google">Login with Google</a>');
 });
 
