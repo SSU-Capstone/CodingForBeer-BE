@@ -7,7 +7,7 @@ require('dotenv').config();
 const yorkie = require('yorkie-js-sdk');
 const mongoose = require('mongoose');
 
-const { create_group, get_groups, create_document, get_documents } = require('./controllers/group_controller');
+const { create_group, get_groups, create_document, get_documents, add_user_to_group } = require('./controllers/group_controller');
 
 const mongoURI = process.env.MONGO_URI;
 const PORT = process.env.PORT

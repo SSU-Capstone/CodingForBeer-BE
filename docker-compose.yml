@@ -23,7 +23,7 @@ services:
     container_name: nodejs
     restart: always
     ports:
-      - '4000:4000'
+      - '8082:4000'
     depends_on:
       - mongo
       - yorkie

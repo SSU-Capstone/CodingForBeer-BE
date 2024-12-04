@@ -14,6 +14,10 @@ const groupSchema = new mongoose.Schema({
     documents: [{
         type: String,
     }],
+    inviteToken : {
+        type : String,
+        default : null,
+    }
     }, {
     timestamps: true, 
     });
