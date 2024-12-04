@@ -75,7 +75,7 @@ app.get('/auth/google/callback',
 
 // Profile route (protected)
 app.get("/auth/status", (req, res) => {
-    if (req.session.isLoggedIn) {
+    if (req.isAuthenticated()) {
         res.json({ loggedIn: true });
     } else {
         res.json({ loggedIn: false });
