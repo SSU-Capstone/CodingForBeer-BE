@@ -45,11 +45,11 @@ passport.use(new GoogleStrategy({
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('<a href="/auth/google">Login with Google</a>');
+    res.send('<a href="/backend/auth/google">Login with Google</a>');
 });
 
 // Google OAuth login route
-app.get('/backend/auth/google', (req, res, next) => {
+app.get('/auth/google', (req, res, next) => {
     const nextUrl = req.query.next || '/'; // Default to '/profile' if no next URL is provided
     const state = JSON.stringify({ next: nextUrl }); // Store `next` in `state`
 
@@ -61,7 +61,7 @@ app.get('/backend/auth/google', (req, res, next) => {
 
 
 // Google OAuth callback route
-app.get('/backend/auth/google/callback',
+app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: '/' }),
     (req, res) => {
         // Decode the `state` parameter to retrieve `next` URL
@@ -74,7 +74,7 @@ app.get('/backend/auth/google/callback',
 );
 
 // Profile route (protected)
-app.get('/backend/profile', async (req, res) => {
+app.get('/profile', async (req, res) => {
     if (!req.isAuthenticated()) {
         return res.redirect('/');
     }
@@ -88,21 +88,21 @@ app.get('/backend/profile', async (req, res) => {
 });
 
 // Logout route
-app.get('/backend/logout', (req, res) => {
+app.get('/logout', (req, res) => {
     req.logout(() => {
         req.session.destroy(); // Destroy session after logout
         res.redirect('/');
     });
 });
 
-app.get('/backend/api/groups', get_groups);
-app.post('/backend/api/groups', create_group);
+app.get('/api/groups', get_groups);
+app.post('/api/groups', create_group);
 
-app.post('/backend/api/groups/:group_name/documents', create_document);
+app.post('/api/groups/:group_name/documents', create_document);
 app.get('/api/groups/:group_name/documents', get_documents);
 
-app.post('/backend/api/groups/:group_name/invite',generate_token);
-app.get('/backend/api/groups/invite/:token',add_user_to_group);
+app.post('/api/groups/:group_name/invite',generate_token);
+app.get('/api/groups/invite/:token',add_user_to_group);
 
 const mongooseOptions = {
     useNewUrlParser: true, // Use the new URL parser
