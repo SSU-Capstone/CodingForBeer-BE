@@ -129,7 +129,7 @@ const generate_token = async (req, res) => {
         await group.save();
 
 
-        const inviteLink = `${req.protocol}://${req.get('host')}/api/groups/invite/${inviteToken}`;
+        const inviteLink = `https://${req.get('host')}/backend/api/groups/invite/${inviteToken}`;
 
         return res.status(200).json({ message: "Invite link generated", inviteLink });
     } catch (error) {
