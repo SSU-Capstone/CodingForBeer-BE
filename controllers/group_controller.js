@@ -145,7 +145,7 @@ const add_user_to_group = async (req, res) => {
     try {
         if (!req.isAuthenticated()) {
             // Redirect to Google OAuth with `next` query parameter to preserve invite token
-            return res.redirect(`/auth/google?next=/api/groups/invite/${inviteToken}`);
+            return res.redirect(`/backend/auth/google?next=/backend/api/groups/invite/${inviteToken}`);
         }
 
         // Validate the invite token
